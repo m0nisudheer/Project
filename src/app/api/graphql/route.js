@@ -1,17 +1,20 @@
-//@ts-ignore
-const  { startServerAndCreateNextHandler } =require( "@as-integrations/next");
-const mercury =require ( "@mercury-js/core");
-const { ApolloServer } =require ( "@apollo/server");
-const { makeExecutableSchema } =require ( "@graphql-tools/schema");
-const { applyMiddleware } =require ( "graphql-middleware");
-const resolvers =require("./signup");
-const typeDefs =require( "./schema");
-const dotenv=require("dotenv");
-dotenv.config();
-const {User}=require ("./model");
+const { startServerAndCreateNextHandler } = require("@as-integrations/next");
+const mercury = require("@mercury-js/core");
+const { ApolloServer } = require("@apollo/server");
+const { makeExecutableSchema } = require("@graphql-tools/schema");
+const { applyMiddleware } = require("graphql-middleware");
+const historyTracking = require("@mercury-js/core/packages/historyTracking");
+const resolvers = require("./signup");
+const typeDefs = require("./typedef");
+const jwt = require("jsonwebtoken");
 
+require("./model");
+// require("./profiles");
+// require('./hooks');
 
-mercury.connect(process.env.DB_URL||"");
+mercury.connect(process.env.DB_URL);
+
+mercury.package([historyTracking()]);
 mercury.addGraphqlSchema(typeDefs, resolvers);
 
 const schema = applyMiddleware(
@@ -27,21 +30,20 @@ const server = new ApolloServer({
 
 const handler = startServerAndCreateNextHandler(server, {
   context: async (req, res) => {
-    const token = req.headers.get("authorization")
-      ? req.headers.get("authorization").split(" ")[1]
+    const token = req.headers.authorization
+      ? req.headers.authorization.split(" ")[1]
       : null;
     let role = "ADMIN";
     let id = "1";
     if (token) {
-      //@ts-ignore
-      const verify: JwtPayload = jwt.verify(
-        token,
-        process.env.JWT_SECRET!
-      );
-
-      if (!(verify.exp! < Math.floor(Date.now() / 1000))) {
-        role = verify.role;
-        id = verify.id;
+      try {
+        const verify = jwt.verify(token, process.env.JWT_SECRET);
+        if (!(verify.exp < Math.floor(Date.now() / 1000))) {
+          role = verify.role;
+          id = verify.id;
+        }
+      } catch (err) {
+        console.error("JWT verification failed", err);
       }
     }
     return {
@@ -54,13 +56,12 @@ const handler = startServerAndCreateNextHandler(server, {
   },
 });
 
-//@ts-ignore
-export const MercuryInstance = mercury;
+exports.MercuryInstance = mercury;
 
-export async function GET(request: any) {
+exports.GET = async function (request) {
   return handler(request);
-}
+};
 
-export async function POST(request: any) {
+exports.POST = async function (request) {
   return handler(request);
-}
+};
