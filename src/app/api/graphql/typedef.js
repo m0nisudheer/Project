@@ -7,6 +7,7 @@ const typeDefs = gql`
     hello(name: String): String,
   }
   type Mutation {
+    signUp(signUpData:signUpData):signUpResponse
     login(userName: String, password: String): LoginResponse
     forgetPassword(email: String): ForgetPasswordResponse
     verifyOtp(email: String, otp: String): VerifyResponse
@@ -18,6 +19,10 @@ const typeDefs = gql`
     token: String
     role: String
     user: String
+  }
+  type signUpResponse{
+    id:String,
+    msg:String
   }
   type ForgetPasswordResponse {
     msg: String
@@ -34,6 +39,11 @@ const typeDefs = gql`
   type NewPasswordResponse {
     id: String
     msg: String
+  }
+  type signUpData{
+    userName: String,
+    email: String,
+    password: String
   }
 `;
 

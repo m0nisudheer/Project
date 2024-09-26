@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const resolvers = {
   Mutation: {
-    signUp: async (root, { signUpData }, ctx) => {
+    signUp: async (root, { signUpData :signUpData}, ctx) => {
       try {
         const userSchema = mercury.db.User;
         const existingUser = await userSchema.mongoModel.findOne({
@@ -18,7 +18,7 @@ const resolvers = {
           userName: signUpData.userName,
           email: signUpData.email,
           password: signUpData.password,
-          role: signUpData.role,
+          // role: signUpData.role,
         });
 
         sendVerificationEmail(signUpData.email);
@@ -32,7 +32,7 @@ const resolvers = {
       }
     },
 
-    signin: async (root, { email, password }) => {
+    login: async (root, { email, password }) => {
       try {
         const UserSchema = mercury.db.User;
         const user = await UserSchema.mongoModel.findOne({ email });
