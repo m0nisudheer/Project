@@ -1,20 +1,22 @@
 const { startServerAndCreateNextHandler } = require("@as-integrations/next");
-const mercury = require("@mercury-js/core");
+// const mercury = require("@mercury-js/core");
+import mercury from "@mercury-js/core"
 const { ApolloServer } = require("@apollo/server");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
 const { applyMiddleware } = require("graphql-middleware");
-const historyTracking = require("@mercury-js/core/packages/historyTracking");
 const resolvers = require("./signup");
 const typeDefs = require("./typedef");
 const jwt = require("jsonwebtoken");
-
-require("./model");
+const dotenv=require("dotenv");
+dotenv.config();
+import "./model"
 // require("./profiles");
 // require('./hooks');
+console.log(process.env.DB_URL);
 
-mercury.connect(process.env.DB_URL);
+mercury.connect("mongodb+srv://charan:123@cluster0.qidbhqj.mongodb.net/User");
 
-mercury.package([historyTracking()]);
+// mercury.package([historyTracking()]);
 mercury.addGraphqlSchema(typeDefs, resolvers);
 
 const schema = applyMiddleware(

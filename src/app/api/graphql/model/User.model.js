@@ -1,27 +1,26 @@
-const mongoose = require("mongoose");
-
-const userSchema = new mongoose.Schema(
+// const mongoose = require("mongoose");
+import mercury from "@mercury-js/core";
+export const User = mercury.createModel("User",
   {
-    username: {
-      type: String,
+    userName: {
+      type: "string",
       required: true,
     },
-    role: {
-      type: String,
-      enum: ['admin', 'user'], // Restrict role to 'admin' or 'user'
-      default: 'user', // Set default role to 'user'
-    },
+    // role: {
+    //   type: "string",
+    //   enum: ['admin', 'user'], // Restrict role to 'admin' or 'user'
+    //   default: 'user', // Set default role to 'user'
+    // },
     email: {
-      type: String,
+      type: "string",
       required: true,
       unique: true,
-      lowercase: true,
     },
     password: {
-      type: String,
+      type: "string",
       required: true,
     },
   },
 );
 
-module.exports = mongoose.model("User", userSchema);
+// module.exports = mongoose.model("User", userSchema);
